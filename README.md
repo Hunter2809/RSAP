@@ -75,55 +75,55 @@ bot.run("bot_token_here")
 ### So the above code would simply run your bot and the bot would reply to **every single message** sent in that channel!!
 
 <br>
-So lemme guess, you are now thinking what are even those `kwargs` mentioned above 😁
+So lemme guess, you are now thinking what are even those `kwargs` mentioned above :grin:
 
 So here is a list of kwargs that you can add to your code!!!
 
-👉 api_key ([str](https://docs.python.org/3/library/stdtypes.html#str)): The API key which you can get from https://api-info.pgamerx.com/register
+:point_right: api_key ([str](https://docs.python.org/3/library/stdtypes.html#str)): The API key which you can get from https://api-info.pgamerx.com/register
 <br><br>
-👉 dev_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the developer who coded the chatbot. Used in responses. Defaults to None.
+:point_right: dev_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the developer who coded the chatbot. Used in responses. Defaults to Hunter.
 <br><br>
-👉 unique_id ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The Unique ID to create custom sessions for each user. Defaults to a random [uuid.uuid4](https://docs.python.org/3/library/uuid.html#uuid.uuid4) string.
+:point_right: unique_id ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The Unique ID to create custom sessions for each user. Defaults to a random [uuid.uuid4](https://docs.python.org/3/library/uuid.html#uuid.uuid4) string.
 <br><br>
-👉 bot_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the chatbot. Used in responses. Defaults to PyChat.
+:point_right: bot_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the chatbot. Used in responses. Defaults to PyChat.
 <br><br>
-👉 type ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
+:point_right: type ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
 <br><br>
-👉 language ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The language to chat with the chatbot in. Defaults to "en".
+:point_right: language ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The language to chat with the chatbot in. Defaults to "en".
 
 
 ## List of Types of Jokes 
 
-😆 `any` 
+:laughing: `any` 
 
-😆 `dev`
+:laughing: `dev`
 
-😆 `spooky`
+:laughing: `spooky`
 
-😆 `pun`
+:laughing: `pun`
 
 
 # List of Types of Images
 
-🖼 `aww`
+:camera: `aww`
 
-🖼 `duck`
+:camera: `duck`
 
-🖼 `dog`
+:camera: `dog`
 
-🖼 `cat`
+:camera: `cat`
 
-🖼 `memes`
+:camera: `memes`
 
-🖼 `dankmemes`
+:camera: `dankmemes`
 
-🖼 `holup`
+:camera: `holup`
 
-🖼 `art`
+:camera: `art`
 
-🖼 `harrypottermemes`
+:camera: `harrypottermemes`
 
-🖼 `facepalm`
+:camera: `facepalm`
 
 
 
