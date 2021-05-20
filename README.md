@@ -8,7 +8,7 @@
 
 
 
-#### RASPI.... well it is not a proper acronym, but you can think of it as `Random API Stuff Python`.. It makes use of PGamerX's Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
+#### RASPI.... well it is not a proper acronym, but you can think of it as `Random API Stuff Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
 
 <br><br>
 ### The usage is very very very simple.. There are mainly two classes of this module (well there are three but I would consider two because third, you can't say that it is a proper "class" of the module.)
