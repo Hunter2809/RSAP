@@ -1,10 +1,10 @@
-class RASPIException(Exception):
+class RSAPException(Exception):
     pass
 
 
-class InvalidKey(RASPIException):
+class InvalidKey(RSAPException):
     pass
 
 
-class InvalidArgument(RASPIException):
+class InvalidArgument(RSAPException):
     pass
