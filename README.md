@@ -8,22 +8,22 @@
 
 
 
-#### RASPI.... well it is not a proper acronym, but you can think of it as `Random API Stuff Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
+#### RSAP.... well it is not a proper acronym, but you can think of it as `Random Stuff API Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
 
 <br><br>
 ### The usage is very very very simple.. There are mainly two classes of this module (well there are three but I would consider two because third, you can't say that it is a proper "class" of the module.)
 
 <br><br>
 # ASYNC USAGE
-To use this module asynchronously, RASPI provides you with the `AsyncRASPI` class of the module... It uses the [aioHTTP](https://docs.aiohttp.org/en/stable/) module to send GET request to the API... A small example for the same is shown below
+To use this module asynchronously, RSAP provides you with the `AsyncRSAP` class of the module... It uses the [aioHTTP](https://docs.aiohttp.org/en/stable/) module to send GET request to the API... A small example for the same is shown below
 
 <br>
 
 ```python
-from RASPI import AsyncRASPI
+from RSAP import AsyncRSAP
 import asyncio
 
-chatbot = AsyncRASPI("api_key_here", "other_kwargs_here")
+chatbot = AsyncRSAP("api_key_here", "other_kwargs_here")
 
 # For AI Response
 response = asyncio.run(chatbot.ai_response("message_here", "unique_id"))
@@ -42,11 +42,11 @@ The code above would use the [aioHTTP](https://docs.aiohttp.org/en/stable/) modu
 
 <br><br>
 # SYNC USAGE
-To use this module synchronously, RASPI provides you with the `RASPI` class of the module... It uses the [requests](https://docs.python-requests.org/en/master/) module to send the GET request to the API... A small example for the same is shown below
+To use this module synchronously, RSAP provides you with the `RSAP` class of the module... It uses the [requests](https://docs.python-requests.org/en/master/) module to send the GET request to the API... A small example for the same is shown below
 ```python
-from RASPI import RASPI
+from RSAP import RSAP
 
-chatbot = RASPI("api_key_here", "other_kwargs_here")
+chatbot = RSAP("api_key_here", "other_kwargs_here")
 
 # For AI Response
 response = chatbot.ai_response("message", "unique_id") 
@@ -63,11 +63,11 @@ print(response)
 The code above would use the [requests](https://docs.python-requests.org/en/master/) module..
 
 <br><br>
-So last of all that, we have that other so-called "class" known as `DisRASPI` class.. It is just an extension of the RASPI module, which uses the discord.py's [commands.Bot](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html?highlight=bot#discord.ext.commands.Bot) module to send the bot responses in a particular Text Channel. It uses the `on_message` trigger to check for messages in the chat channel.. The example for the same is shown below
+So last of all that, we have that other so-called "class" known as `DisRSAP` class.. It is just an extension of the RSAP module, which uses the discord.py's [commands.Bot](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html?highlight=bot#discord.ext.commands.Bot) module to send the bot responses in a particular Text Channel. It uses the `on_message` trigger to check for messages in the chat channel.. The example for the same is shown below
 
 ```python
-from RASPI import DisRASPI
-bot = DisRASPI("api_key_here", text_channel_id_here, command_prefix="!", "other_kwargs_here") #Don't specify any intents because "discord.Intents.all()" is already enabled in the source code...
+from RSAP import DisRSAP
+bot = DisRSAP("api_key_here", text_channel_id_here, command_prefix="!", "other_kwargs_here") #Don't specify any intents because "discord.Intents.all()" is already enabled in the source code...
 
 bot.run("bot_token_here")
 
@@ -128,6 +128,6 @@ So here is a list of kwargs that you can add to your code!!!
 
 
 # CONTACT ME
-Need some help for some things?? Add me on discord, `нυηтєя#8785`.. My username seems difficult?? (I know it is but I like it ¯\_(ツ)_/¯) Anyways, join [this discord](https://discord.gg/GWugD56QnE) (is of a friend), and you can always find me here ;D
+Need some help for some things??Join [this discord](https://discord.gg/GWugD56QnE) (is of a friend), and you can always find me here :D (Not giving the name because...... there are no unicode characters in that :D)
 <br><br>
 ## Also, if you want to buy the pro packs the API, be sure to check [this out](https://form.jotform.com/211240494443449)!
