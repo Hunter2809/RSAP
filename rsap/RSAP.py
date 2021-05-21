@@ -1,8 +1,6 @@
 from uuid import uuid4
 import requests
-from requests.api import head
 from .exceptions import InvalidArgument, InvalidKey
-"pro, ultra, biz, mega"
 
 
 class RSAP:
