@@ -10,6 +10,12 @@
 
 #### RSAP.... well it is not a proper acronym, but you can think of it as `Random Stuff API Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
 
+### The installation is also very very very simple.
+```
+pip install rsap
+```
+### This will install `rsap` **with only** [requests](https://docs.python-requests.org/en/master/) module.. You need to install [aioHTTP](https://docs.aiohttp.org/en/stable/) for AsyncRSAP and [discord.py](https://discordpy.readthedocs.io/en/latest/) for DisRSAP
+
 <br><br>
 ### The usage is very very very simple.. There are mainly two classes of this module (well there are three but I would consider two because third, you can't say that it is a proper "class" of the module.)
 
@@ -20,7 +26,7 @@ To use this module asynchronously, RSAP provides you with the `AsyncRSAP` class 
 <br>
 
 ```python
-from RSAP import AsyncRSAP
+from rsap import AsyncRSAP
 import asyncio
 
 chatbot = AsyncRSAP("api_key_here", "other_kwargs_here")
@@ -44,7 +50,7 @@ The code above would use the [aioHTTP](https://docs.aiohttp.org/en/stable/) modu
 # SYNC USAGE
 To use this module synchronously, RSAP provides you with the `RSAP` class of the module... It uses the [requests](https://docs.python-requests.org/en/master/) module to send the GET request to the API... A small example for the same is shown below
 ```python
-from RSAP import RSAP
+from rsap import RSAP
 
 chatbot = RSAP("api_key_here", "other_kwargs_here")
 
@@ -66,7 +72,7 @@ The code above would use the [requests](https://docs.python-requests.org/en/mast
 So last of all that, we have that other so-called "class" known as `DisRSAP` class.. It is just an extension of the RSAP module, which uses the discord.py's [commands.Bot](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html?highlight=bot#discord.ext.commands.Bot) module to send the bot responses in a particular Text Channel. It uses the `on_message` trigger to check for messages in the chat channel.. The example for the same is shown below
 
 ```python
-from RSAP import DisRSAP
+from rsap import DisRSAP
 bot = DisRSAP("api_key_here", text_channel_id_here, command_prefix="!", "other_kwargs_here") #Don't specify any intents because "discord.Intents.all()" is already enabled in the source code...
 
 bot.run("bot_token_here")
