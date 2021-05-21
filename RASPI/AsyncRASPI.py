@@ -3,7 +3,7 @@ from uuid import uuid4
 from .exceptions import InvalidArgument, InvalidKey
 
 
-class AsyncRASPI:
+class AsyncRSAP:
     def __init__(self, api_key: str, **kwargs) -> None:
         """The async class for interacting with the Random Stuff API. It uses the aioHTTP module to get the responses from the API..
 
