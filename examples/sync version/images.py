@@ -1,5 +1,5 @@
 """
-    An Example telling about how to use this module's images feature on command line
+    An Example telling about how to use this module's images feature on command line (sync)
 """
 
 from rsap import RSAP
@@ -7,4 +7,4 @@ from rsap import RSAP
 images_bot = RSAP("api_key")  # Put your own API KEY here
 
 
-print(images_bot.image("optional type here"))  # Put optional type kwarg here
+print(images_bot.image())
