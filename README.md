@@ -134,6 +134,6 @@ So here is a list of kwargs that you can add to your code!!!
 
 
 # CONTACT ME
-Need some help for some things??Join [this discord](https://discord.gg/GWugD56QnE) (is of a friend), and you can always find me here :D (Not giving the name because...... there are no unicode characters in that :D)
+Need some help for some things?? Join [this discord](https://discord.gg/GWugD56QnE) (is of a friend), and you can always find me here or add me on discord `нυηтєя#8785` :D
 <br><br>
 ## Also, if you want to buy the pro packs the API, be sure to check [this out](https://form.jotform.com/211240494443449)!
