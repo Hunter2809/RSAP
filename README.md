@@ -43,6 +43,8 @@ print(response)
 response = asyncio.run(chatbot.image("type"))
 print(response)
 
+# For closing connection
+asyncio.run(chatbot.close())
 ```
 The code above would use the [aioHTTP](https://docs.aiohttp.org/en/stable/) module..
 
@@ -65,6 +67,9 @@ print(response)
 # For Images
 response = chatbot.image("type")
 print(response)
+
+# For closing connection
+chatbot.close()
 ```
 The code above would use the [requests](https://docs.python-requests.org/en/master/) module..
 

@@ -51,18 +51,18 @@ class RSAP:
                 if requests.get(links, params=params, headers=self.headers).json()[0]["message"] != "Unauthorized":
                     self.working_ai_links.append(links)
         if len(self.working_ai_links) == 0:
-            with requests.get("https://api.pgamerx.com/v3/ai/response", params=params, headers=self.headers) as session:
-                if session.status_code == 401:
+            with requests.get("https://api.pgamerx.com/v3/ai/response", params=params, headers=self.headers) as self.session:
+                if self.session.status_code == 401:
                     raise InvalidKey("You passed in an Invalid API KEY")
-                if session.status_code == 200:
-                    text = session.json()
+                if self.session.status_code == 200:
+                    text = self.session.json()
                     return text[0]["message"]
         if len(self.working_ai_links) != 0:
-            with requests.get(self.working_ai_links[0], params=params, headers=self.headers) as session:
-                if session.status_code == 401:
+            with requests.get(self.working_ai_links[0], params=params, headers=self.headers) as self.session:
+                if self.session.status_code == 401:
                     raise InvalidKey("You passed in an Invalid API KEY")
-                if session.status_code == 200:
-                    text = session.json()
+                if self.session.status_code == 200:
+                    text = self.session.json()
                     return text[0]["message"]
 
     def joke(self, type: str = "any") -> dict:
@@ -83,11 +83,11 @@ class RSAP:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._jokes_types:
-            with requests.get(url=f'https://api.pgamerx.com/v3/joke/{type}', headers=self.headers) as session:
-                if session.status_code == 401:
+            with requests.get(url=f'https://api.pgamerx.com/v3/joke/{type}', headers=self.headers) as self.session:
+                if self.session.status_code == 401:
                     raise InvalidKey("You passed in an Invalid API KEY")
-                if session.status_code == 200:
-                    text = session.json()
+                if self.session.status_code == 200:
+                    text = self.session.json()
                     return text
 
     def image(self, type: str = "memes") -> str:
@@ -108,8 +108,28 @@ class RSAP:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._image_types:
-            with requests.get(url=f'https://api.pgamerx.com/v3/image/{type}', headers=self.headers) as session:
-                if session.status_code == 401:
+            with requests.get(url=f'https://api.pgamerx.com/v3/image/{type}', headers=self.headers) as self.session:
+                if self.session.status_code == 401:
                     raise InvalidKey("You passed in an Invalid API KEY")
-                if session.status_code == 200:
-                    return session.json()[0]
+                if self.session.status_code == 200:
+                    return self.session.json()[0]
+
+    def meme(self) -> str:
+        """The dedicated sync method to get a meme from the API
+
+        Raises:
+            InvalidKey: The exception raised when a wrong key is provided and the API returns a 401 error code
+
+        Returns:
+            str: The meme's image URL
+        """
+        with requests.get(url=f'https://api.pgamerx.com/v3/image/memes', headers=self.headers) as self.session:
+            if self.session.status_code == 401:
+                raise InvalidKey("You passed in an Invalid API KEY")
+            if self.session.status_code == 200:
+                return self.session.json()[0]
+
+    def close(self) -> None:
+        """Gracefully closes the connection to the API
+        """
+        self.session.close()

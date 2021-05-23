@@ -53,18 +53,18 @@ class AsyncRSAP:
                     if await ses.get(links, params=params).json()[0]["message"] != "Unauthorized":
                         self.working_ai_links.append(links)
             if len(self.working_ai_links) == 0:
-                async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
-                    if response.status == 401:
+                async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as self.response:
+                    if self.response.status == 401:
                         raise InvalidKey("You passed in an Invalid API KEY")
-                    if response.status == 200:
-                        text = await response.json()
+                    if self.response.status == 200:
+                        text = await self.response.json()
                         return text[0]["message"]
             if len(self.working_ai_links) != 0:
-                async with ses.get(self.working_ai_links[0], params=params) as response:
-                    if response.status == 401:
+                async with ses.get(self.working_ai_links[0], params=params) as self.response:
+                    if self.response.status == 401:
                         raise InvalidKey("You passed in an Invalid API KEY")
-                    if response.status == 200:
-                        text = await response.json()
+                    if self.response.status == 200:
+                        text = await self.response.json()
                         return text[0]["message"]
 
     async def joke(self, type: str = "any") -> dict:
@@ -86,11 +86,11 @@ class AsyncRSAP:
                 "The arguments you specified is not a valid type")
         if type.lower() in self._jokes_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as response:
-                    if response.status == 401:
+                async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as self.response:
+                    if self.response.status == 401:
                         raise InvalidKey("You passed in an Invalid API KEY")
-                    if response.status == 200:
-                        text = await response.json()
+                    if self.response.status == 200:
+                        text = await self.response.json()
                         return text
 
     async def image(self, type: str = "memes") -> str:
@@ -112,8 +112,29 @@ class AsyncRSAP:
                 "The arguments you specified is not a valid type")
         if type.lower() in self._image_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(url=f'https://api.pgamerx.com/v3/image/{type}') as response:
-                    if response.status == 401:
+                async with session.get(url=f'https://api.pgamerx.com/v3/image/{type}') as self.response:
+                    if self.response.status == 401:
                         raise InvalidKey("You passed in an Invalid API KEY")
-                    if response.status == 200:
-                        return await response.json()[0]
+                    if self.response.status == 200:
+                        return await self.response.json()[0]
+
+    async def meme(self) -> str:
+        """The dedicated async method to get a meme from the API
+
+        Raises:
+            InvalidKey: The exception raised when a wrong key is provided and the API returns a 401 error code
+
+        Returns:
+            str: The meme's image URL
+        """
+        async with aiohttp.ClientSession(headers=self.headers) as session:
+            async with session.get(url=f'https://api.pgamerx.com/v3/image/memes') as self.response:
+                if self.response.status == 401:
+                    raise InvalidKey("You passed in an Invalid API KEY")
+                if self.response.status == 200:
+                    return await self.response.json()[0]
+
+    async def close(self) -> None:
+        """Gracefully closes the connection to the API
+        """
+        await self.response.close()
