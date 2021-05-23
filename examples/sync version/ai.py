@@ -7,6 +7,4 @@ from rsap import RSAP
 chatbot = RSAP("api_key")  # Put your own API KEY here
 
 
-while True:
-    question = input("> ")
-    print(chatbot.ai_response(question))
+print(chatbot.ai_response("Hey"))

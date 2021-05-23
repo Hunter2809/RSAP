@@ -6,6 +6,9 @@
 
 ![Hunter's GitHub stats](https://github-readme-stats.vercel.app/api?username=Hunter2807&show_icons=true&theme=radical)
 
+## WARNING- USE **ONLY** A VALID API KEY. THE API **ALWAYS** RETURNS A 200 STATUS CODE, AND IT IS NOT A PROBLEM WITH `rsap`.. YOU CAN FOLLOW THIS ISSUE [HERE](https://github.com/pgamerxdev/projects/issues/18)
+
+<br><br>
 
 
 #### RSAP.... well it is not a proper acronym, but you can think of it as `Random Stuff API Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
