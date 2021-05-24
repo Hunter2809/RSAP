@@ -1,9 +1,20 @@
 import aiohttp
 from uuid import uuid4
-from .exceptions import InvalidArgument, InvalidKey
 from random import choice
 
 __all__ = ["AsyncRSAP"]
+
+
+class RSAPException(Exception):
+    pass
+
+
+class InvalidKey(RSAPException):
+    pass
+
+
+class InvalidArgument(RSAPException):
+    pass
 
 
 class AsyncRSAP:
@@ -25,9 +36,9 @@ class AsyncRSAP:
         self.type = kwargs.get("type", "stable"),
         self.language = kwargs.get("language", "en")
         self.plan = kwargs.get("plan", None)
-        if self.plan not in self._plans:
+        if self.plan not in self.plans and self.plan is not None:
             raise InvalidArgument(
-                "The plan name you provided is not a valid plan")
+                "The plan you mentioned is not valid")
         if self.plan in self._plans:
             pass
         self.headers = {"x-api-key": self.key[0]}
@@ -55,12 +66,6 @@ class AsyncRSAP:
         params = {"unique_id": unique_id or str(uuid4()), "dev_name": self.dev or "Hunter",
                   "bot_name": self.bot or "PyChat", "language": self.language or "en", "message": message, "type": self.type or "stable"}
         async with aiohttp.ClientSession(headers=self.headers) as ses:
-            if self.plan is None:
-                for links in self.ai_links:
-                    if await ses.get(links, params=params).json()[0]["message"] == "Unauthorized":
-                        return
-                    if await ses.get(links, params=params).json()[0]["message"] != "Unauthorized":
-                        self.working_ai_links.append(links)
             if self.plan is not None:
                 async with ses.get(f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params) as response:
                     text = await response.json()
@@ -68,12 +73,19 @@ class AsyncRSAP:
                         async with ses.get(
                                 "https://api.pgamerx.com/v3/ai/response", params=params) as response:
                             text = await response.json()
-                            return text[0]["message"]
+                            if text[0]["message"] == "Unauthorized":
+                                raise InvalidKey(
+                                    "The API key you provided is not a valid one. Please recheck it")
+                            else:
+                                return text[0]["message"]
                     else:
                         return text[0]["message"]
             if len(self.working_ai_links) == 0:
                 async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
                     text = await response.json()
+                    if text[0]["message"] == "Unauthorized":
+                        raise InvalidKey(
+                            "The API key you provided is not a valid one. Please recheck it")
                     return text[0]["message"]
             if len(self.working_ai_links) != 0:
                 async with ses.get(self.working_ai_links[0], params=params) as response:
@@ -114,6 +126,13 @@ class AsyncRSAP:
             async with aiohttp.ClientSession(headers=self.headers) as session:
                 async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as response:
                     text = await response.json()
+                    try:
+                        text[0]["message"]
+                    except KeyError:
+                        pass
+                    else:
+                        raise InvalidKey(
+                            "The API key you provided is not a valid one. Please recheck it")
                     joke_category = text["category"]
                     joke_type = text["type"]
                     flags = []
@@ -135,7 +154,7 @@ class AsyncRSAP:
                                      "joke": joke, "language": joke_lang, "flags": flags}
                     return joke_dict
 
-    async def image(self, type: str) -> str:
+    async def image(self, image_type: str) -> str:
         f"""The async method to get an image from the API
 
         Args:
@@ -149,14 +168,19 @@ class AsyncRSAP:
         Returns:
             str: The image URL
         """
-        type = type or choice(self._image_types)
-        if type.lower() not in self._image_types:
+        image_type = image_type or choice(self._image_types)
+        if image_type.lower() not in self._image_types:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
-        if type.lower() in self._image_types:
+        if image_type.lower() in self._image_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(url=f'https://api.pgamerx.com/v3/image/{type}') as response:
-                    return await response.json()[0]
+                async with session.get(url=f'https://api.pgamerx.com/v3/image/{image_type}') as response:
+                    text = await response.json()
+                    if type(text[0]) is not dict:
+                        return text[0]
+                    if type(text[0]) is dict:
+                        raise InvalidKey(
+                            "The API key you supplied is not a valid one. Please recheck the key")
 
     async def meme(self) -> str:
         """The dedicated async method to get a meme from the API
@@ -168,5 +192,10 @@ class AsyncRSAP:
             str: The meme's image URL
         """
         async with aiohttp.ClientSession(headers=self.headers) as session:
-            async with session.get(url=f'https://api.pgamerx.com/v3/image/memes') as response:
-                return await response.json()[0]
+            async with session.get(url=f'https://api.pgamerx.com/v3/image/{choice(["memes", "dankmemes"])}') as response:
+                text = await response.json()
+                if type(text[0]) is not dict:
+                    return text[0]
+                if type(text[0]) is dict:
+                    raise InvalidKey(
+                        "The API key you supplied is not a valid one. Please recheck the key")
