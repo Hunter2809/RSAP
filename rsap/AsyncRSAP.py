@@ -31,6 +31,9 @@ class AsyncRSAP:
             plan(str, optional): The plan, if any, that you have subscribed to.
         """
         self.key = api_key,
+        if self.api_key == "":
+            raise InvalidKey(
+                "The API key you provided is not a valid one. Please recheck it")
         self.dev = kwargs.get("dev_name", "Hunter"),
         self.bot = kwargs.get("bot_name", "PyChat"),
         self.type = kwargs.get("type", "stable"),
@@ -66,31 +69,49 @@ class AsyncRSAP:
         params = {"unique_id": unique_id or str(uuid4()), "dev_name": self.dev or "Hunter",
                   "bot_name": self.bot or "PyChat", "language": self.language or "en", "message": message, "type": self.type or "stable"}
         async with aiohttp.ClientSession(headers=self.headers) as ses:
+            if self.plan is None:
+                for link in self.ai_links:
+                    async with ses.get(link, params=params) as response:
+                        if response.status == 401:
+                            return
+                        if response.status == 200:
+                            self.working_ai_links.append(link)
             if self.plan is not None:
                 async with ses.get(f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params) as response:
                     text = await response.json()
-                    if text[0]["message"] == "Unauthorized":
+                    if response.status == 401:
                         async with ses.get(
                                 "https://api.pgamerx.com/v3/ai/response", params=params) as response:
                             text = await response.json()
-                            if text[0]["message"] == "Unauthorized":
+                            if response.status == 401:
                                 raise InvalidKey(
                                     "The API key you provided is not a valid one. Please recheck it")
-                            else:
+                            if response.status == 200:
                                 return text[0]["message"]
-                    else:
+                    if response.status == 200:
                         return text[0]["message"]
             if len(self.working_ai_links) == 0:
                 async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
                     text = await response.json()
-                    if text[0]["message"] == "Unauthorized":
+                    if response.status == 401:
                         raise InvalidKey(
                             "The API key you provided is not a valid one. Please recheck it")
-                    return text[0]["message"]
+                    if response.status == 200:
+                        return text[0]["message"]
             if len(self.working_ai_links) != 0:
                 async with ses.get(self.working_ai_links[0], params=params) as response:
                     text = await response.json()
-                    return text[0]["message"]
+                    if response.status == 401:
+                        async with ses.get(
+                                "https://api.pgamerx.com/v3/ai/response", params=params) as response:
+                            text = await response.json()
+                            if response.status == 401:
+                                raise InvalidKey(
+                                    "The API key you provided is not a valid one. Please recheck it")
+                            if response.status == 200:
+                                return text[0]["message"]
+                    if response.status == 200:
+                        return text[0]["message"]
 
     async def joke(self, type: str = "any") -> dict:
         f"""The async method to get a joke of a given category
@@ -125,14 +146,10 @@ class AsyncRSAP:
         if type.lower() in self._jokes_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
                 async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as response:
-                    text = await response.json()
-                    try:
-                        text[0]["message"]
-                    except KeyError:
-                        pass
-                    else:
+                    if response.status == 401:
                         raise InvalidKey(
                             "The API key you provided is not a valid one. Please recheck it")
+                    text = await response.json()
                     joke_category = text["category"]
                     joke_type = text["type"]
                     flags = []
@@ -175,12 +192,11 @@ class AsyncRSAP:
         if image_type.lower() in self._image_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
                 async with session.get(url=f'https://api.pgamerx.com/v3/image/{image_type}') as response:
-                    text = await response.json()
-                    if type(text[0]) is not dict:
-                        return text[0]
-                    if type(text[0]) is dict:
+                    if response.status == 401:
                         raise InvalidKey(
-                            "The API key you supplied is not a valid one. Please recheck the key")
+                            "The API key you provided is not a valid one. Please recheck it")
+                    text = await response.json()
+                    return text[0]
 
     async def meme(self) -> str:
         """The dedicated async method to get a meme from the API
@@ -193,9 +209,8 @@ class AsyncRSAP:
         """
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(url=f'https://api.pgamerx.com/v3/image/{choice(["memes", "dankmemes"])}') as response:
-                text = await response.json()
-                if type(text[0]) is not dict:
-                    return text[0]
-                if type(text[0]) is dict:
+                if response.status == 401:
                     raise InvalidKey(
-                        "The API key you supplied is not a valid one. Please recheck the key")
+                        "The API key you provided is not a valid one. Please recheck it")
+                text = await response.json()
+                return text[0]

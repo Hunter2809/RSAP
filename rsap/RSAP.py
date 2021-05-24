@@ -31,6 +31,9 @@ class RSAP:
             plan(str, optional): The plan, if any, that you have subscribed to.
         """
         self.key = api_key,
+        if self.key == "":
+            raise InvalidKey(
+                "The API key you provided is not a valid one. Please recheck it")
         self.dev = kwargs.get("dev_name", "Hunter"),
         self.bot = kwargs.get("bot_name", "PyChat"),
         self.type = kwargs.get("type", "stable"),
@@ -64,34 +67,52 @@ class RSAP:
         """
         params = {"unique_id": unique_id or uuid4(), "dev_name": self.dev,
                   "bot_name": self.bot, "language": self.language, "message": message, "type": self.type}
+        if self.plan is None:
+            for link in self.ai_links:
+                session = self.session.get(link, params=params)
+                if session.status_code == 401:
+                    return
+                if session.status_code == 200:
+                    self.working_ai_links.append(link)
         if self.plan is not None:
             session = self.session.get(
                 f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params)
             text = session.json()
-            if text[0]["message"] == "Unauthorized":
+            if session.status_code == 401:
                 session = self.session.get(
                     "https://api.pgamerx.com/v3/ai/response", params=params)
                 text = session.json()
-                if text[0]["message"] == "Unauthorized":
+                if session.status_code == 401:
                     raise InvalidKey(
                         "The API key you provided is not a valid one. Please recheck it")
-                else:
+                if session.status_code == 200:
                     return text[0]["message"]
-            else:
+            if session.status_code == 200:
                 return text[0]["message"]
         if len(self.working_ai_links) == 0:
             session = self.session.get(
                 "https://api.pgamerx.com/v3/ai/response", params=params)
             text = session.json()
-            if text[0]["message"] == "Unauthorized":
+            if session.status_code == 200:
+                return text[0]["message"]
+            if session.status_code == 401:
                 raise InvalidKey(
                     "The API key you provided is not a valid one. Please recheck it")
-            return text[0]["message"]
         if len(self.working_ai_links) != 0:
             session = self.session.get(
                 self.working_ai_links[0], params=params)
             text = session.json()
-            return text[0]["message"]
+            if session.status_code == 200:
+                return text[0]["message"]
+            if session.status_code == 401:
+                session = self.session.get(
+                    "https://api.pgamerx.com/v3/ai/response", params=params)
+                text = session.json()
+                if session.status_code == 200:
+                    return text[0]["message"]
+                if session.status_code == 401:
+                    raise InvalidKey(
+                        "The API key you provided is not a valid one. Please recheck it")
 
     def joke(self, type: str = "any") -> dict:
         f"""The sync method to get a joke of a given category
@@ -126,14 +147,10 @@ class RSAP:
         if type.lower() in self._jokes_types:
             session = self.session.get(
                 url=f'https://api.pgamerx.com/v3/joke/{type}')
-            text = session.json()
-            try:
-                text[0]["message"]
-            except KeyError:
-                pass
-            else:
+            if session.status_code == 401:
                 raise InvalidKey(
                     "The API key you provided is not a valid one. Please recheck it")
+            text = session.json()
             joke_category = text["category"]
             joke_type = text["type"]
             flags = []
@@ -177,12 +194,11 @@ class RSAP:
         if image_type.lower() in self._image_types:
             session = self.session.get(
                 url=f'https://api.pgamerx.com/v3/image/{image_type}')
-            text = session.json()
-            if type(text[0]) is not dict:
-                return text[0]
-            if type(text[0]) is dict:
+            if session.status_code == 401:
                 raise InvalidKey(
-                    "The API key you supplied is not a valid one. Please recheck the key")
+                    "The API key you provided is not a valid one. Please recheck it")
+            text = session.json()
+            return text[0]
 
     def meme(self) -> str:
         """The dedicated sync method to get a meme from the API
@@ -195,9 +211,13 @@ class RSAP:
         """
         session = self.session.get(
             url=f'https://api.pgamerx.com/v3/image/{choice(["memes", "dankmemes"])}')
-        text = session.json()
-        if type(text[0]) is not dict:
-            return text[0]
-        if type(text[0]) is dict:
+        if session.status_code == 401:
             raise InvalidKey(
-                "The API key you supplied is not a valid one. Please recheck the key")
+                "The API key you provided is not a valid one. Please recheck it")
+        text = session.json()
+        return text[0]
+
+    def close(self) -> None:
+        """Closes the connection gracefully
+        """
+        self.session.close()

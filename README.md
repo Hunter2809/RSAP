@@ -5,9 +5,6 @@
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
 ![Hunter's GitHub stats](https://github-readme-stats.vercel.app/api?username=Hunter2807&show_icons=true&theme=radical)
-
-## WARNING- USE **ONLY** A VALID API KEY. THE API **ALWAYS** RETURNS A 200 STATUS CODE, AND IT IS NOT A PROBLEM WITH `rsap`.. YOU CAN FOLLOW THIS ISSUE [HERE](https://github.com/pgamerxdev/projects/issues/18)
-
 <br><br>
 
 
@@ -32,18 +29,18 @@ To use this module asynchronously, RSAP provides you with the `AsyncRSAP` class 
 from rsap import AsyncRSAP
 import asyncio
 
-chatbot = AsyncRSAP("api_key_here", "other_kwargs_here")
+bot = AsyncRSAP("api_key_here", "other_kwargs_here")
 
 # For AI Response
-response = asyncio.run(chatbot.ai_response("message_here", "unique_id"))
+response = asyncio.run(bot.ai_response("message_here", "unique_id"))
 print(response)
 
 # For Jokes
-response = asyncio.run(chatbot.jokes("type"))
+response = asyncio.run(bot.jokes("type"))
 print(response)
 
 # For Images
-response = asyncio.run(chatbot.image("type"))
+response = asyncio.run(bot.image("type"))
 print(response)
 ```
 The code above would use the [aioHTTP](https://docs.aiohttp.org/en/stable/) module..
@@ -54,19 +51,22 @@ To use this module synchronously, RSAP provides you with the `RSAP` class of the
 ```python
 from rsap import RSAP
 
-chatbot = RSAP("api_key_here", "other_kwargs_here")
+bot = RSAP("api_key_here", "other_kwargs_here")
 
 # For AI Response
-response = chatbot.ai_response("message", "unique_id") 
+response = bot.ai_response("message", "unique_id") 
 print(response)
 
 # For Jokes
-response = chatbot.joke("type")
+response = bot.joke("type")
 print(response)
 
 # For Images
-response = chatbot.image("type")
+response = bot.image("type")
 print(response)
+
+# For Closing
+bot.close()
 ```
 The code above would use the [requests](https://docs.python-requests.org/en/master/) module..
 
