@@ -1,8 +1,9 @@
-
 import discord
 from .exceptions import InvalidArgument
 from discord.ext.commands.bot import Bot
 from .AsyncRSAP import AsyncRSAP
+
+__all__ = ["DisRSAP"]
 
 
 class DisRSAP(Bot):

@@ -1,6 +1,9 @@
 from uuid import uuid4
 import requests
+from random import choice
 from .exceptions import InvalidArgument, InvalidKey
+
+__all__ = ["RSAP"]
 
 
 class RSAP:
@@ -14,12 +17,14 @@ class RSAP:
             bot_name (str, optional): The name of the chatbot. Used in responses. Defaults to PyChat.
             type (str, optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
             language (str, optional): The language to chat with the chatbot in. Defaults to "en".
+            plan(str, optional): The plan, if any, that you have subscribed to.
         """
         self.key = api_key,
         self.dev = kwargs.get("dev_name", "Hunter"),
         self.bot = kwargs.get("bot_name", "PyChat"),
         self.type = kwargs.get("type", "stable"),
         self.language = kwargs.get("language", "en")
+        self.plan = kwargs.get("plan", None)
         self.headers = {"x-api-key": self.key[0]}
         self._jokes_types = ("any", "dev", "spooky", "pun")
         self._image_types = ("aww", "duck", "dog", "cat", "memes",
@@ -27,6 +32,8 @@ class RSAP:
         self.ai_links = ("https://api.pgamerx.com/v3/pro/ai/response", "https://api.pgamerx.com/v3/ultra/ai/response",
                          "https://api.pgamerx.com/v3/biz/ai/response", "https://api.pgamerx.com/v3/mega/ai/response")
         self.working_ai_links = []
+        self.session = requests.Session()
+        self.session.headers.update(self.headers)
 
     def ai_response(self, message: str, unique_id: str = None) -> str:
         """The sync method to get the AI response to a given message
@@ -42,28 +49,33 @@ class RSAP:
         """
         params = {"unique_id": unique_id or uuid4(), "dev_name": self.dev,
                   "bot_name": self.bot, "language": self.language, "message": message, "type": self.type}
-        for links in self.ai_links:
-            if requests.get(links, params=params, headers=self.headers).status_code != 200:
-                raise InvalidKey("You passed in an Invalid API KEY")
-            if requests.get(links, params=params, headers=self.headers).status_code == 200:
+        if self.plan is None:
+            for links in self.ai_links:
                 if requests.get(links, params=params, headers=self.headers).json()[0]["message"] == "Unauthorized":
-                    pass
+                    return
                 if requests.get(links, params=params, headers=self.headers).json()[0]["message"] != "Unauthorized":
                     self.working_ai_links.append(links)
+        if self.plan is not None:
+            session = self.session.get(
+                f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params)
+            text = session.json()
+            if text[0]["message"] == "Unauthorized":
+                session = self.session.get(
+                    "https://api.pgamerx.com/v3/ai/response", params=params)
+                text = session.json()
+                return text[0]["message"]
+            else:
+                return text[0]["message"]
         if len(self.working_ai_links) == 0:
-            with requests.get("https://api.pgamerx.com/v3/ai/response", params=params, headers=self.headers) as self.session:
-                if self.session.status_code == "401":
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if self.session.status_code == "200":
-                    text = self.session.json()
-                    return text[0]["message"]
+            session = self.session.get(
+                "https://api.pgamerx.com/v3/ai/response", params=params)
+            text = session.json()
+            return text[0]["message"]
         if len(self.working_ai_links) != 0:
-            with requests.get(self.working_ai_links[0], params=params, headers=self.headers) as self.session:
-                if self.session.status_code == "401":
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if self.session.status_code == "200":
-                    text = self.session.json()
-                    return text[0]["message"]
+            session = self.session.get(
+                self.working_ai_links[0], params=params)
+            text = session.json()
+            return text[0]["message"]
 
     def joke(self, type: str = "any") -> dict:
         f"""The sync method to get a joke of a given category
@@ -77,24 +89,54 @@ class RSAP:
             InvalidKey: The exception raised when a wrong key is provided and the API returns a 401 error code
 
         Returns:
-            dict: The dict of the response recieved. It does not return str because the joke can be two way or one way. Though I will change it in the future to return the joke
+            dict: The dict of the joke recieved. The dict is in the form of {{category: the joke category, type: the joke type, joke: the joke, language: the joke language, flags: the flags of the joke}}
+            Category --> The category to which the joke belongs, like `Christmas`
+            Type --> If the joke consists of two strings or one.
+                     If the joke type is `twopart`, then the `joke` key is a list, with the first element being the question and second being the answer
+                     If the joke type is `joke`, then the `joke` key is simply the joke
+            Joke --> The main joke
+            Flags --> The list of flags associated with the joke. If all the flags are False, then there would be no key named `flags`. There are numerous flags, which are named below -> 
+                      -> NSFW
+                      -> Religious
+                      -> Political
+                      -> Racist
+                      -> Sexist
+                      -> Explicit
+            Language --> The language of the joke (mostly `en`)
         """
         if type.lower() not in self._jokes_types:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._jokes_types:
-            with requests.get(url=f'https://api.pgamerx.com/v3/joke/{type}', headers=self.headers) as self.session:
-                if self.session.status_code == "401":
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if self.session.status_code == "200":
-                    text = self.session.json()
-                    return text
+            session = self.session.get(
+                url=f'https://api.pgamerx.com/v3/joke/{type}')
+            text = session.json()
+            joke_category = text["category"]
+            joke_type = text["type"]
+            flags = []
+            for flag in text["flags"].keys():
+                if text["flags"][flag] == "False":
+                    return
+                if text["flags"][flag] == "True":
+                    flags.append(flag)
+            if joke_type != "twopart":
+                joke = text["joke"]
+            if joke_type == "twopart":
+                joke = [text["setup"], text["delivery"]]
+            joke_lang = text["lang"]
+            if len(flags) == 0:
+                joke_dict = {"category": joke_category, "type": joke_type,
+                             "joke": joke, "language": joke_lang}
+            if len(flags) != 0:
+                joke_dict = {"category": joke_category, "type": joke_type,
+                             "joke": joke, "language": joke_lang, "flags": flags}
+            return joke_dict
 
-    def image(self, type: str = "memes") -> str:
+    def image(self, type: str) -> str:
         f"""The sync method to get an image from the API
 
         Args:
-            type (str): The type of image to return. The types supported are {self._image_types}. Defaults to memes
+            type (str): The type of image to return. The types supported are {self._image_types}.
 
         Raises:
             InvalidArgument: The exception raised when a non existing type is provided
@@ -104,15 +146,14 @@ class RSAP:
         Returns:
             str: The image URL
         """
+        type = type or choice(self._image_types)
         if type.lower() not in self._image_types:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._image_types:
-            with requests.get(url=f'https://api.pgamerx.com/v3/image/{type}', headers=self.headers) as self.session:
-                if self.session.status_code == "401":
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if self.session.status_code == "200":
-                    return self.session.json()[0]
+            session = self.session.get(
+                url=f'https://api.pgamerx.com/v3/image/{type}')
+            return session.json()[0]
 
     def meme(self) -> str:
         """The dedicated sync method to get a meme from the API
@@ -123,13 +164,6 @@ class RSAP:
         Returns:
             str: The meme's image URL
         """
-        with requests.get(url=f'https://api.pgamerx.com/v3/image/memes', headers=self.headers) as self.session:
-            if self.session.status_code == "401":
-                raise InvalidKey("You passed in an Invalid API KEY")
-            if self.session.status_code == "200":
-                return self.session.json()[0]
-
-    def close(self) -> None:
-        """Gracefully closes the connection to the API
-        """
-        self.session.close()
+        session = self.session.get(
+            url=f'https://api.pgamerx.com/v3/image/memes')
+        return session.json()[0]

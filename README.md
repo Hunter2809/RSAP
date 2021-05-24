@@ -45,9 +45,6 @@ print(response)
 # For Images
 response = asyncio.run(chatbot.image("type"))
 print(response)
-
-# For closing connection
-asyncio.run(chatbot.close())
 ```
 The code above would use the [aioHTTP](https://docs.aiohttp.org/en/stable/) module..
 
@@ -70,9 +67,6 @@ print(response)
 # For Images
 response = chatbot.image("type")
 print(response)
-
-# For closing connection
-chatbot.close()
 ```
 The code above would use the [requests](https://docs.python-requests.org/en/master/) module..
 
@@ -81,7 +75,7 @@ So last of all that, we have that other so-called "class" known as `DisRSAP` cla
 
 ```python
 from rsap import DisRSAP
-bot = DisRSAP("api_key_here", text_channel_id_here, command_prefix="!", "other_kwargs_here") #Don't specify any intents because "discord.Intents.all()" is already enabled in the source code...
+bot = DisRSAP("api_key_here", text_channel_id_here, command_prefix="!", "other_kwargs_here") #Don't specify any intents because "discord.Intents.all()" is already enabled in the source code.
 
 bot.run("bot_token_here")
 
@@ -89,59 +83,70 @@ bot.run("bot_token_here")
 ### So the above code would simply run your bot and the bot would reply to **every single message** sent in that channel!!
 
 <br>
-So lemme guess, you are now thinking what are even those `kwargs` mentioned above :grin:
+So lemme guess, you are now thinking what are even those `kwargs` mentioned above 😁
 
 So here is a list of kwargs that you can add to your code!!!
 
-:point_right: api_key ([str](https://docs.python.org/3/library/stdtypes.html#str)): The API key which you can get from https://api-info.pgamerx.com/register
+👉 api_key ([str](https://docs.python.org/3/library/stdtypes.html#str)): The API key which you can get from https://api-info.pgamerx.com/register
 <br><br>
-:point_right: dev_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the developer who coded the chatbot. Used in responses. Defaults to Hunter.
+👉 dev_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the developer who coded the chatbot. Used in responses. Defaults to Hunter.
 <br><br>
-:point_right: unique_id ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The Unique ID to create custom sessions for each user. Defaults to a random [uuid.uuid4](https://docs.python.org/3/library/uuid.html#uuid.uuid4) string.
+👉 unique_id ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The Unique ID to create custom sessions for each user. Defaults to a random [uuid.uuid4](https://docs.python.org/3/library/uuid.html#uuid.uuid4) string.
 <br><br>
-:point_right: bot_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the chatbot. Used in responses. Defaults to PyChat.
+👉 bot_name ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The name of the chatbot. Used in responses. Defaults to PyChat.
 <br><br>
-:point_right: type ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
+👉 type ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
 <br><br>
-:point_right: language ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The language to chat with the chatbot in. Defaults to "en".
+👉 language ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The language to chat with the chatbot in. Defaults to "en".
+<br><br>
+👉 plan ([str](https://docs.python.org/3/library/stdtypes.html#str), optional): The plan, if any, that you have subscribed to. Defaults to `None`
 
 
 ## List of Types of Jokes 
 
-:laughing: `any` 
+😆 `any` 
 
-:laughing: `dev`
+😆 `dev`
 
-:laughing: `spooky`
+😆 `spooky`
 
-:laughing: `pun`
+😆 `pun`
 
 
 # List of Types of Images
 
-:camera: `aww`
+📸 `aww`
 
-:camera: `duck`
+📸 `duck`
 
-:camera: `dog`
+📸 `dog`
 
-:camera: `cat`
+📸 `cat`
 
-:camera: `memes`
+📸 `memes`
 
-:camera: `dankmemes`
+📸 `dankmemes`
 
-:camera: `holup`
+📸 `holup`
 
-:camera: `art`
+📸 `art`
 
-:camera: `harrypottermemes`
+📸 `harrypottermemes`
 
-:camera: `facepalm`
+📸 `facepalm`
 
+# List of Plans
+
+📝 `pro`
+
+📝 `ultra`
+
+📝 `biz`
+
+📝 `mega`
 
 
 # CONTACT ME
 Need some help for some things?? Join [this discord](https://discord.gg/GWugD56QnE) (is of a friend), and you can always find me here or add me on discord `нυηтєя#8785` :D
 <br><br>
-## Also, if you want to buy the pro packs the API, be sure to check [this out](https://form.jotform.com/211240494443449)!
+## Also, if you want to buy the pro plans of the API, be sure to check [this out](https://form.jotform.com/211240494443449)!

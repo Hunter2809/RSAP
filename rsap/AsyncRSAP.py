@@ -1,6 +1,9 @@
 import aiohttp
 from uuid import uuid4
 from .exceptions import InvalidArgument, InvalidKey
+from random import choice
+
+__all__ = ["AsyncRSAP"]
 
 
 class AsyncRSAP:
@@ -14,13 +17,21 @@ class AsyncRSAP:
             bot_name (str, optional): The name of the chatbot. Used in responses. Defaults to None.
             type (str, optional): The type of API to use. Stable is recommended but can also be `unstable`. Defaults to "stable".
             language (str, optional): The language to chat with the chatbot in. Defaults to "en".
+            plan(str, optional): The plan, if any, that you have subscribed to.
         """
         self.key = api_key,
         self.dev = kwargs.get("dev_name", "Hunter"),
         self.bot = kwargs.get("bot_name", "PyChat"),
         self.type = kwargs.get("type", "stable"),
         self.language = kwargs.get("language", "en")
+        self.plan = kwargs.get("plan", None)
+        if self.plan not in self._plans:
+            raise InvalidArgument(
+                "The plan name you provided is not a valid plan")
+        if self.plan in self._plans:
+            pass
         self.headers = {"x-api-key": self.key[0]}
+        self._plans = ("pro", "ultra", "biz", "mega")
         self._jokes_types = ("any", "dev", "spooky", "pun")
         self._image_types = ("aww", "duck", "dog", "cat", "memes",
                              "dankmemes", "holup", "art", "harrypottermemes", "facepalm")
@@ -44,28 +55,30 @@ class AsyncRSAP:
         params = {"unique_id": unique_id or str(uuid4()), "dev_name": self.dev or "Hunter",
                   "bot_name": self.bot or "PyChat", "language": self.language or "en", "message": message, "type": self.type or "stable"}
         async with aiohttp.ClientSession(headers=self.headers) as ses:
-            for links in self.ai_links:
-                if ses.get(links, params=params).status != 200:
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if ses.get(links, params=params).status == 200:
-                    if await ses.get(links, params=params).json()[0]["message"] != "Unauthorized":
+            if self.plan is None:
+                for links in self.ai_links:
+                    if await ses.get(links, params=params).json()[0]["message"] == "Unauthorized":
                         return
                     if await ses.get(links, params=params).json()[0]["message"] != "Unauthorized":
                         self.working_ai_links.append(links)
+            if self.plan is not None:
+                async with ses.get(f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params) as response:
+                    text = await response.json()
+                    if text[0]["message"] == "Unauthorized":
+                        async with ses.get(
+                                "https://api.pgamerx.com/v3/ai/response", params=params) as response:
+                            text = await response.json()
+                            return text[0]["message"]
+                    else:
+                        return text[0]["message"]
             if len(self.working_ai_links) == 0:
-                async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as self.response:
-                    if self.response.status == "401":
-                        raise InvalidKey("You passed in an Invalid API KEY")
-                    if self.response.status == "200":
-                        text = await self.response.json()
-                        return text[0]["message"]
+                async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
+                    text = await response.json()
+                    return text[0]["message"]
             if len(self.working_ai_links) != 0:
-                async with ses.get(self.working_ai_links[0], params=params) as self.response:
-                    if self.response.status == "401":
-                        raise InvalidKey("You passed in an Invalid API KEY")
-                    if self.response.status == "200":
-                        text = await self.response.json()
-                        return text[0]["message"]
+                async with ses.get(self.working_ai_links[0], params=params) as response:
+                    text = await response.json()
+                    return text[0]["message"]
 
     async def joke(self, type: str = "any") -> dict:
         f"""The async method to get a joke of a given category
@@ -79,21 +92,50 @@ class AsyncRSAP:
             InvalidKey: The exception raised when a wrong key is provided and the API returns a 401 error code
 
         Returns:
-            dict: The dict of the response recieved. It does not return str because the joke can be two way or one way. Though I will change it in the future to return the joke
+            dict: The dict of the joke recieved. The dict is in the form of {{category: the joke category, type: the joke type, joke: the joke, language: the joke language, flags: the flags of the joke}}
+            Category --> The category to which the joke belongs, like `Christmas`
+            Type --> If the joke consists of two strings or one.
+                     If the joke type is `twopart`, then the `joke` key is a list, with the first element being the question and second being the answer
+                     If the joke type is `joke`, then the `joke` key is simply the joke
+            Joke --> The main joke
+            Flags --> The list of flags associated with the joke. If all the flags are False, then there would be no key named `flags`. There are numerous flags, which are named below -> 
+                      -> NSFW
+                      -> Religious
+                      -> Political
+                      -> Racist
+                      -> Sexist
+                      -> Explicit
+            Language --> The language of the joke (mostly `en`)
         """
         if type.lower() not in self._jokes_types:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._jokes_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as self.response:
-                    if self.response.status == "401":
-                        raise InvalidKey("You passed in an Invalid API KEY")
-                    if self.response.status == "200":
-                        text = await self.response.json()
-                        return text
+                async with session.get(url=f'https://api.pgamerx.com/v3/joke/{type}') as response:
+                    text = await response.json()
+                    joke_category = text["category"]
+                    joke_type = text["type"]
+                    flags = []
+                    for flag in text["flags"].keys():
+                        if text["flags"][flag] == "False":
+                            return
+                        if text["flags"][flag] == "True":
+                            flags.append(flag)
+                    if joke_type != "twopart":
+                        joke = text["joke"]
+                    if joke_type == "twopart":
+                        joke = [text["setup"], text["delivery"]]
+                    joke_lang = text["lang"]
+                    if len(flags) == 0:
+                        joke_dict = {"category": joke_category, "type": joke_type,
+                                     "joke": joke, "language": joke_lang}
+                    if len(flags) != 0:
+                        joke_dict = {"category": joke_category, "type": joke_type,
+                                     "joke": joke, "language": joke_lang, "flags": flags}
+                    return joke_dict
 
-    async def image(self, type: str = "memes") -> str:
+    async def image(self, type: str) -> str:
         f"""The async method to get an image from the API
 
         Args:
@@ -107,16 +149,14 @@ class AsyncRSAP:
         Returns:
             str: The image URL
         """
+        type = type or choice(self._image_types)
         if type.lower() not in self._image_types:
             raise InvalidArgument(
                 "The arguments you specified is not a valid type")
         if type.lower() in self._image_types:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(url=f'https://api.pgamerx.com/v3/image/{type}') as self.response:
-                    if self.response.status == "401":
-                        raise InvalidKey("You passed in an Invalid API KEY")
-                    if self.response.status == "200":
-                        return await self.response.json()[0]
+                async with session.get(url=f'https://api.pgamerx.com/v3/image/{type}') as response:
+                    return await response.json()[0]
 
     async def meme(self) -> str:
         """The dedicated async method to get a meme from the API
@@ -128,13 +168,5 @@ class AsyncRSAP:
             str: The meme's image URL
         """
         async with aiohttp.ClientSession(headers=self.headers) as session:
-            async with session.get(url=f'https://api.pgamerx.com/v3/image/memes') as self.response:
-                if self.response.status == "401":
-                    raise InvalidKey("You passed in an Invalid API KEY")
-                if self.response.status == "200":
-                    return await self.response.json()[0]
-
-    async def close(self) -> None:
-        """Gracefully closes the connection to the API
-        """
-        await self.response.close()
+            async with session.get(url=f'https://api.pgamerx.com/v3/image/memes') as response:
+                return await response.json()[0]
