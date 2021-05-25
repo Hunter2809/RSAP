@@ -39,19 +39,18 @@ class AsyncRSAP:
         self.type = kwargs.get("type", "stable"),
         self.language = kwargs.get("language", "en")
         self.plan = kwargs.get("plan", None)
-        if self.plan not in self._plans and self.plan is not None:
+        self.plans = ("pro", "ultra", "biz", "mega")
+        if self.plan not in self.plans and self.plan is not None:
             raise InvalidArgument(
                 "The plan you mentioned is not valid")
-        if self.plan in self._plans:
+        if self.plan in self.plans:
             pass
         self.headers = {"x-api-key": self.key[0]}
-        self._plans = ("pro", "ultra", "biz", "mega")
         self._jokes_types = ("any", "dev", "spooky", "pun")
         self._image_types = ("aww", "duck", "dog", "cat", "memes",
                              "dankmemes", "holup", "art", "harrypottermemes", "facepalm")
         self.ai_links = ("https://api.pgamerx.com/v3/pro/ai/response", "https://api.pgamerx.com/v3/ultra/ai/response",
                          "https://api.pgamerx.com/v3/biz/ai/response", "https://api.pgamerx.com/v3/mega/ai/response")
-        self.working_ai_links = []
 
     async def ai_response(self, message: str, unique_id: str = None) -> str:
         """The async method to get the AI response to a given message
@@ -73,44 +72,29 @@ class AsyncRSAP:
                 for link in self.ai_links:
                     async with ses.get(link, params=params) as response:
                         if response.status == 401:
-                            return
+                            async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
+                                if response.status == 401:
+                                    raise InvalidKey(
+                                        "The API key you provided is not a valid one. Please recheck it")
+                                if response.status == 200:
+                                    text = await response.json()
+                                    return text[0]["message"]
                         if response.status == 200:
-                            self.working_ai_links.append(link)
+                            text = await response.json()
+                            return text[0]["message"]
             if self.plan is not None:
                 async with ses.get(f"https://api.pgamerx.com/v3/{self.plan}/ai/response", params=params) as response:
-                    text = await response.json()
                     if response.status == 401:
                         async with ses.get(
                                 "https://api.pgamerx.com/v3/ai/response", params=params) as response:
-                            text = await response.json()
                             if response.status == 401:
                                 raise InvalidKey(
                                     "The API key you provided is not a valid one. Please recheck it")
                             if response.status == 200:
+                                text = await response.json()
                                 return text[0]["message"]
                     if response.status == 200:
-                        return text[0]["message"]
-            if len(self.working_ai_links) == 0:
-                async with ses.get("https://api.pgamerx.com/v3/ai/response", params=params) as response:
-                    text = await response.json()
-                    if response.status == 401:
-                        raise InvalidKey(
-                            "The API key you provided is not a valid one. Please recheck it")
-                    if response.status == 200:
-                        return text[0]["message"]
-            if len(self.working_ai_links) != 0:
-                async with ses.get(self.working_ai_links[0], params=params) as response:
-                    text = await response.json()
-                    if response.status == 401:
-                        async with ses.get(
-                                "https://api.pgamerx.com/v3/ai/response", params=params) as response:
-                            text = await response.json()
-                            if response.status == 401:
-                                raise InvalidKey(
-                                    "The API key you provided is not a valid one. Please recheck it")
-                            if response.status == 200:
-                                return text[0]["message"]
-                    if response.status == 200:
+                        text = await response.json()
                         return text[0]["message"]
 
     async def joke(self, type: str = "any") -> dict:
