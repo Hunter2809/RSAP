@@ -40,7 +40,7 @@ class RSAP:
         self.language = kwargs.get("language", "en")
         self.plan = kwargs.get("plan", None)
         self.plans = ("pro", "ultra", "biz", "mega")
-        if self.plan not in self.plans and self.plan is not None:
+        if self.plan not in self._plans and self.plan is not None:
             raise InvalidArgument(
                 "The plan you mentioned is not valid")
         self.headers = {"x-api-key": self.key[0]}

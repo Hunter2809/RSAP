@@ -39,7 +39,7 @@ class AsyncRSAP:
         self.type = kwargs.get("type", "stable"),
         self.language = kwargs.get("language", "en")
         self.plan = kwargs.get("plan", None)
-        if self.plan not in self.plans and self.plan is not None:
+        if self.plan not in self._plans and self.plan is not None:
             raise InvalidArgument(
                 "The plan you mentioned is not valid")
         if self.plan in self._plans:
