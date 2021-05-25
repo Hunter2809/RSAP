@@ -31,7 +31,7 @@ class AsyncRSAP:
             plan(str, optional): The plan, if any, that you have subscribed to.
         """
         self.key = api_key,
-        if self.api_key == "":
+        if self.key == "":
             raise InvalidKey(
                 "The API key you provided is not a valid one. Please recheck it")
         self.dev = kwargs.get("dev_name", "Hunter"),
