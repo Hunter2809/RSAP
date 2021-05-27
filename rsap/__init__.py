@@ -1,7 +1,7 @@
 from .AsyncRSAP import *
 from .RSAP import *
 from .DisRSAP import *
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 __author__ = "Hunter"
 __copyright__ = f"Copyright 2021 - Present {__author__}"
 __title = "RSAP"

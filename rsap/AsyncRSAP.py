@@ -20,7 +20,6 @@ class AsyncRSAP:
             language (str, optional): The language to chat with the chatbot in. Defaults to "en".
             plan(str, optional): The plan, if any, that you have subscribed to.
         """
-        logging.basicConfig(level=logging.NOTSET)
         self.key = api_key,
         if self.key == "":
             logging.critical(
