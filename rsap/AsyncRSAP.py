@@ -1,5 +1,5 @@
 import aiohttp
-from uuid import uuid4, UUID
+from uuid import uuid4
 from random import choice
 import logging
 from rsap.exceptions import *
@@ -62,11 +62,7 @@ class AsyncRSAP:
         Returns:
             str: The response recieved from the API
         """
-        if type(unique_id) is UUID:
-            unique_id = str(unique_id)
-        else:
-            unique_id = unique_id
-        params = {"unique_id": unique_id, "dev_name": self.dev,
+        params = {"unique_id": str(unique_id), "dev_name": self.dev,
                   "bot_name": self.bot, "language": self.language, "message": message, "type": self.type}
         logging.info(
             f"Setting the GET request params to the API. Params = {params}")
