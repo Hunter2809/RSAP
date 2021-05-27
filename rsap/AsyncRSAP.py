@@ -20,7 +20,7 @@ class AsyncRSAP:
             language (str, optional): The language to chat with the chatbot in. Defaults to "en".
             plan(str, optional): The plan, if any, that you have subscribed to.
         """
-        self.key = api_key,
+        self.key = api_key
         if self.key == "":
             logging.critical(
                 msg=f"The API Key you supplied is not a valid one... The one you supplied was {self.key}")
@@ -62,8 +62,8 @@ class AsyncRSAP:
         Returns:
             str: The response recieved from the API
         """
-        params = {"unique_id": str(unique_id), "dev_name": self.dev,
-                  "bot_name": self.bot, "language": self.language, "message": message, "type": self.type}
+        params = {"unique_id": str(unique_id), "dev_name": str(self.dev),
+                  "bot_name": str(self.bot), "language": str(self.language), "message": str(message), "type": str(self.type)}
         logging.info(
             f"Setting the GET request params to the API. Params = {params}")
         async with aiohttp.ClientSession(headers=self.headers) as ses:
