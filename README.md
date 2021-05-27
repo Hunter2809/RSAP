@@ -1,11 +1,8 @@
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes!-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![Maintaner](https://img.shields.io/badge/Maintainer-Hunter-blue)
 [![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/Naereen/badges/)
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
-
-![Hunter's GitHub stats](https://github-readme-stats.vercel.app/api?username=Hunter2807&show_icons=true&theme=radical)
-<br><br>
 
 
 #### RSAP.... well it is not a proper acronym, but you can think of it as `Random Stuff API Python`.. It makes use of [PGamerX](https://github.com/pgamerxdev)'s Random Stuff API to provide you features such as jokes, memes, images and also an **AI CHATBOT!!**
@@ -15,6 +12,9 @@
 pip install rsap
 ```
 ### This will install `rsap` **with only** [requests](https://docs.python-requests.org/en/master/) module.. You need to install [aioHTTP](https://docs.aiohttp.org/en/stable/) for AsyncRSAP and [discord.py](https://discordpy.readthedocs.io/en/latest/) for DisRSAP
+
+<br><br>
+The module uses the [logging](https://docs.python.org/3/library/logging.html) module of python to print logs to console. Add `logging.basicConfig(level=logging.NOTSET)` to the top of your code and all the the logs would get printed to the console
 
 <br><br>
 ### The usage is very very very simple.. There are mainly two classes of this module (well there are three but I would consider two because third, you can't say that it is a proper "class" of the module.)

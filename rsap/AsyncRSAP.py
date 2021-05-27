@@ -6,6 +6,7 @@ from rsap.exceptions import *
 
 __all__ = ["AsyncRSAP"]
 
+
 class AsyncRSAP:
     def __init__(self, api_key: str, **kwargs) -> None:
         """The async class for interacting with the Random Stuff API. It uses the aioHTTP module to get the responses from the API..
@@ -26,22 +27,22 @@ class AsyncRSAP:
                 msg=f"The API Key you supplied is not a valid one... The one you supplied was {self.key}")
             raise InvalidKey(
                 "The API key you provided is not a valid one. Please recheck it")
-        self.dev = kwargs.get("dev_name", "Hunter"),
+        self.dev = kwargs.get("dev_name", "Hunter")
         logging.info(msg=f"The bot's dev name is set to {self.dev}")
-        self.bot = kwargs.get("bot_name", "PyChat"),
+        self.bot = kwargs.get("bot_name", "PyChat")
         logging.info(msg=f"The bot's name is set to {self.bot}")
-        self.type = kwargs.get("type", "stable"),
+        self.type = kwargs.get("type", "stable")
         logging.info(msg=f"The API's type is set to {self.type}")
         self.language = kwargs.get("language", "en")
-        logging.info(msg=f"The API's type is set to {self.language}")
+        logging.info(msg=f"The API's language is set to {self.language}")
         self.plan = kwargs.get("plan", None)
-        logging.info(msg=f"The API's type is set to {self.type or 'Free'}")
+        logging.info(msg=f"The API's plan is set to {self.type or 'Free'}")
         self.plans = ("pro", "ultra", "biz", "mega")
         if self.plan not in self.plans and self.plan is not None:
             logging.error(
                 msg=f"The API plan you supplied is not a valid one... The one you supplied was {self.key}. Setting it to 'Free")
             self.plan = None
-        self.headers = {"x-api-key": self.key[0]}
+        self.headers = {"x-api-key": self.key}
         logging.info(msg=f"Setting the GET request header to {self.headers}")
         self._jokes_types = ("any", "dev", "spooky", "pun")
         self._image_types = ("aww", "duck", "dog", "cat", "memes",
@@ -66,9 +67,10 @@ class AsyncRSAP:
             unique_id = str(unique_id)
         else:
             unique_id = unique_id
-        params = {"unique_id": unique_id, "dev_name": self.dev[0],
-                  "bot_name": self.bot[0], "language": self.language[0], "message": message, "type": self.type[0]}
-        logging.info(f"Setting the GET request to the API. Params = {params}")
+        params = {"unique_id": unique_id, "dev_name": self.dev,
+                  "bot_name": self.bot, "language": self.language, "message": message, "type": self.type}
+        logging.info(
+            f"Setting the GET request params to the API. Params = {params}")
         async with aiohttp.ClientSession(headers=self.headers) as ses:
             if self.plan is None:
                 logging.info(
